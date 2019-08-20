@@ -1,10 +1,9 @@
-function result = solveEquation(M)
+function result = solveLinearEquation(M)
+%% This function takes an augmented matrix as argument and calculates the solution
 
     [m, n] = size(M);
     
-    tinyNumber = 1e-6;
-    pivotLocations = zeros(m, 1);
-    
+    tinyNumber = 1e-6;    
     % Forward phase of row reduction
     c = 1;
     for r=1:m
@@ -34,13 +33,14 @@ function result = solveEquation(M)
         end
         % Continue the row reducing using the current field
         % Point this field as pivot location
-        pivotLocations(r) = c;
         M(r, :) = M(r, :) / M(r, c);
-        for t=r+1:m
-            % Making every field zero below the field
-            k = -M(t, c);
+        for t=1:m
+            % Making every field zero below and above the field
+            if t~= r
+               k = -M(t, c);
             if ~(k == 0 || isnan(k))
                 M(t, :) = M(t, :) + k * M(r, :);
+            end 
             end
         end
         % Going to the next column if there is left
@@ -51,39 +51,7 @@ function result = solveEquation(M)
         end
     end
     M(abs(M) < tinyNumber) = 0;
-    forwardPhase = M;
-    
-    % Backward phase
-    for r=m:-1:1
-        % No solution if zero = nonzero
-        if M(r, end) ~= 0 && nnz(M(r, :)) == 1
-            disp("This equation has no solution.");
-            M = forwardPhase;
-            break;
-        end
-        % Scaling current field to 1 if it is not zero
-        % and if it is pivot column. Zero means no pivot field on that
-        % row
-        c = pivotLocations(r);
-        if c == 0
-            continue;
-        end
-        curValue = M(r, c);
-        % if current value is zero, than there is no pivot on this row
-        if curValue == 0
-            continue;
-        end
-        M = scale(M, r, 1/curValue);
-        for t=r-1:-1:1
-            % Making every field zero above the row r, column c
-            k = -M(t, c);
-            if k ~= 0
-                M(t, :) = M(t, :) + k * M(r,:);
-            end
-        end
-    end
-   
+
     % Assign the result
     result = M;
-    
 end
