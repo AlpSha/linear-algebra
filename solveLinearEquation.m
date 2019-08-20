@@ -1,7 +1,26 @@
-function result = solveLinearEquation(M)
-%% This function takes an augmented matrix as argument and calculates the solution
+function result = solveLinearEquation(M, varargin)
+%% This function takes a matrix as argument and applies row reducing
+% if you provide second argument as 0, then it applies row reducing
+% on every column if necessary
+    
+    numvarargs = length(varargin);
+    if numvarargs > 1
+        error('myfuns:somefun2Alt:TooManyInputs',...
+            'requires at most 1 optional input');
+    end
+    
+    optargs = {1};
+    optargs(1:numvarargs) = varargin;
+    [augmented] = optargs{:};
+
 
     [m, n] = size(M);
+    
+    % We don't make reduction on last column
+    % if our matrix is augmented
+    if(augmented)
+        n = n-1;
+    end
     
     tinyNumber = 1e-6;    
     % Forward phase of row reduction
@@ -15,7 +34,7 @@ function result = solveLinearEquation(M)
             % the next column.
             if r+count > m
                 % Break if also checked the last column
-                if c >= n-1
+                if c >= n
                     allZero = 1;
                     break
                 end
@@ -44,7 +63,7 @@ function result = solveLinearEquation(M)
             end
         end
         % Going to the next column if there is left
-        if c < n-1
+        if c < n
             c = c+1;
         else
             break;
