@@ -12,8 +12,7 @@ function result = solveLinearEquation(M, varargin)
     optargs = {1};
     optargs(1:numvarargs) = varargin;
     [augmented] = optargs{:};
-
-
+    
     [m, n] = size(M);
     
     % We don't make reduction on last column
@@ -38,9 +37,9 @@ function result = solveLinearEquation(M, varargin)
                     allZero = 1;
                     break
                 end
-                c = c+1
+                c = c+1;
                 count = 1;
-            elseif M(r+count, c) == 0
+            elseif abs(M(r+count, c)) <= tinyNumber
                 count = count + 1;
             else
                 M = swap(M, r, r+count);
@@ -50,9 +49,11 @@ function result = solveLinearEquation(M, varargin)
             % Nothing left to do, all remaining fields are zero
             break;
         end
-        % Continue the row reducing using the current field
+        % Continue to the row reducing using the current field
         % Point this field as pivot location
-        M(r, :) = M(r, :) / M(r, c);
+        if ~(abs(M(r, c)) <= tinyNumber)
+            M(r, :) = M(r, :) / M(r, c);
+        end
         for t=1:m
             % Making every field zero below and above the field
             if t~= r
